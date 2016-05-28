@@ -16,6 +16,7 @@
     "url": "https://github.com/matutter/scrappee/issues"
   },
   "scripts": {
+    "test-ordinal" : "node.exe scrappee.js -u \"https://github.com/matutter/{}\" -us \"cloggie, AirRocks-Flightcontroller\" -s \"li.commits > a > span, .right .commit-tease-sha\" -pm \".\\test\\example_parse_module.js\"",
     "test" : "node.exe scrappee.js -u \"https://github.com/matutter/{}\" -us \"cloggie, AirRocks-Flightcontroller\" -s \"$commit=li.commits > a > span, $sha=.right .commit-tease-sha\" -pm \".\\test\\example_parse_module.js\""
   },
   "homepage": "https://github.com/matutter/scrappee#readme",

@@ -16,6 +16,8 @@ function Query(url, selector) {
 		request: hash([url, selector]),
 		response: ''
 	}
+	this.key = null
+	this.data = {}
 }
 
 function scrape(params) {
@@ -30,18 +32,24 @@ function scrape(params) {
 	urls.forEach( url => request(url, function(e, res, html){
 		if(e) return console.log(e)
 
+		var $ = cheerio.load(html)
+
 		var data = {}
-		var $ = cheerio.load(html);
 
 		select.forEach( selector => {
-
 			var query = new Query(url, selector)
 			var text = $(selector.selector).text()
 			var key = selector.key || selector.ordinal
-			data[key] = parser[key] ? parser[key](text) : text
-
-
+			query.key = key
+			if(selector.ordinal)
+				query.data = parser[key] ? parser[key](text) : text
+			else
+				query.data[key] = parser[key] ? parser[key](text) : text
+			query.hash.response = hash(html)
+			data[query.key] = query
 		})
+
+		data.length = select.length
 
 		console.log(data)
 	}))
