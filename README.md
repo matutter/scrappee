@@ -16,10 +16,10 @@ Usage:
 '-selectors, -s,      Selector list - Comma separated list of selectors.
 -select, -sel                         Selectors may contain the following syntax
                                       $&lt;key&gt;=&lt;selector&gt; to allow methods of the 
-                                      parse module to be called by the $&lt;key$&gt;.
+                                      parse module to be called by the &lt;key&gt;.
                                       The query objects produced will have a data
                                       property which contains the parsed or unparsed 
-                                      data in the same way; query.data.$&lt;key$&gt; = $&lt;data$&gt;
+                                      data in the same way; query.data.&lt;key&gt; = &lt;data&gt;
                                       Without the selector key syntax content in 
                                       placed by orginality and may be accessed via
                                       query[&lt;index&gt;].
