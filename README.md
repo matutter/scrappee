@@ -6,9 +6,10 @@ A simple web-scraper cmd line tool.
 
 Usage:
 <pre>
--url, -u              Base url      - 
+-url, -u              Base url      - Base url, may contain {} to be replaced by
+                                      the url sequece tokens.
 
--url-sequence,        Url sequence  - Comma separated list of urls to replace
+-url-sequence,        Url sequence  - Comma separated list of tokens to replace
 -url-seq, -us                         the {} identifier in the base url.
 
 '-selectors, -s,      Selector list - Comma separated list of selectors.
@@ -25,7 +26,7 @@ Usage:
 -parse-module,        Parse module  - nodejs module which will be loaded to parse
 -parse-mod, -pm                       text from the website's content.
                                       Module contract below.
-<pre>
+</pre>
 
 __Parse Module Contract__
 The selector list syntax $&lt;key&lt;=&gt;selector&gt; allows exports from the parse-module
