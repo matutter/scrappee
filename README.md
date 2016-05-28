@@ -1,6 +1,7 @@
 ==================
 SCRAPPEE
 ==================
+
 A simple web-scraper cmd line tool.
 
 
@@ -30,7 +31,7 @@ Usage:
 
 __Parse Module Contract__
 
-The selector list syntax ```<key>=<selector>``` allows exports from the parse-module
+The selector list syntax ```$<key>=<selector>``` allows exports from the parse-module
 to be used to work on the text of the selected content. 
 
 ```javascript
