@@ -29,6 +29,7 @@ Usage:
 </pre>
 
 __Parse Module Contract__
+
 The selector list syntax $&lt;key&lt;=&gt;selector&gt; allows exports from the parse-module
 to be used to work on the text of the selected content. 
 
