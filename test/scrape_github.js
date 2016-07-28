@@ -36,7 +36,6 @@ describe('GET from github.com/matutter', function() {
         .get("https://github.com/matutter")
         .select(selectors1)
         .then((e, data) => {
-          console.log('\ttest 1 returned', data)
           assert.equal(e, null) // no error
           assert.deepEqual(data, expected)
           done()          
@@ -49,11 +48,40 @@ describe('GET from github.com/matutter', function() {
         .url('https://github.com/matutter/scrappee')
         .select(selectors2)
         .then((err, data) => {
-          console.log('\ttest 2 returned', data)
           assert.equal(err, null)
           assert.equal(data.name, 'scrappee')
           done()
         })
     })
   })
+
+  describe('When a bad uri is provided', function() {
+    it('should return an error and data will be null', function(done) {
+      client
+        .get('www')
+        .select( { key: ()=>{throw new Error('my error')} })
+        .then(function(err, data) {
+          assert.equal(data, null)
+          assert.equal(err.message, 'Invalid URI "www"')
+          done()
+        })
+    })
+  })
+
+  //http://www.purple.com/purple.html
+  describe('When a bad uri is provided', function() {
+    it('should return an error and data will be null', function(done) {
+      client
+        .get('http://www.purple.com/purple.html')
+        .select( { key: ()=>{throw new Error('my error')} })
+        .then(function(err, data) {
+          assert.equal(data, null)
+          assert.equal(err.message, 'my error')
+          done()
+        })
+    })
+  })
+
+  //http://www.purple.com/purple.html
+
 })
