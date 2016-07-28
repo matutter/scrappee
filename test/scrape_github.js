@@ -69,8 +69,8 @@ describe('GET from github.com/matutter', function() {
   })
 
   //http://www.purple.com/purple.html
-  describe('When a bad uri is provided', function() {
-    it('should return an error and data will be null', function(done) {
+  describe('When an error is thrown in a function handler', function() {
+    it('should return a value on err argument and data will be null', function(done) {
       client
         .get('http://www.purple.com/purple.html')
         .select( { key: ()=>{throw new Error('my error')} })
