@@ -1,6 +1,6 @@
-==================
-SCRAPPEE
-==================
+[![dependencies Status](https://david-dm.org/matutter/scrappee/status.svg)](https://david-dm.org/matutter/scrappee)
+
+# SCRAPPEE
 
 A simple web-scraper cmd line tool.
 
