@@ -82,6 +82,4 @@ describe('GET from github.com/matutter', function() {
     })
   })
 
-  //http://www.purple.com/purple.html
-
 })

@@ -3,61 +3,112 @@ const request = require('request')
 const jquery = require('jquery')
 const jsdom = require('jsdom').jsdom
 
-function Client() {
-  this.location = null
-  this.selectors = null
-  this.method = null
+const defaultParams = {
+  cached: true
+}
+
+function Client(params) {
+  this._url = null
+  this._selectors = null
+  this._method = null
+  this._cached = params.cached
+  this.cache = {}
+}
+
+Client.prototype.cached = function(cached) {
+  this._cached = cached
+  return this
 }
 
 Client.prototype.select = function(selectors) {
-  this.selectors = selectors
+  this._selectors = selectors
   return this
 }
 
 Client.prototype.url = function(url) {
-  this.location = url
+  this._url = url
   return this
 }
 
 Client.prototype.get = function(url) {
-  this.method = request.get
+  this._method = request.get
   return this.url(url)
 }
 
 Client.prototype.post = function(url) {
-  this.method = request.post
+  this._method = request.post
   return this.url(url)
 }
 
+Client.prototype.addCache = function(key, domData) {
+  this.cache[key] = domData
+}
+
+Client.prototype.getCache = function(key) {
+  return this.cache[key] || false
+}
+
 Client.prototype.then = function(cb) {
-  var ref = Object.assign({}, this)
-  if(!this.location) throw new TypeError('URL not set')
+  if(!this._url) throw new TypeError('URL not set')
   if(!cb) throw new TypeError('Callback expected')
 
-  ref.method(ref.location, function (err, res, html) {
-    if(err) return cb(err, null)
-
-    if(ref.selectors) {
-      var document = jsdom(html, {})
-      var window = document.defaultView
-      var $ = jquery(window)
-
-      $(document).ready(function() {
-        var error = null
-        var data = null
-        
-        try {
-          data = object = walk($, ref.selectors)
-        } catch(e) {
-          error = e
+  var url = this._url
+  var urlHash = hash(url)
+  var method = this._method
+  var selectors = this._selectors
+  var cached = this._cached
+  var cache = this.getCache(urlHash)
+  
+  if(cache) {
+    if(selectors) {
+      documentReady(cache.document, cache.$, selectors, cb)
+    } else {
+      cb(null, cache.html)
+    }
+  } else {
+    method(url, (err, res, html) => {
+      if(err) return cb(err, null)
+      if(selectors) {
+        var domData = applySelectors(url, html, selectors, cb)
+        if(cached) {
+          this.addCache(urlHash, domData)
         }
+      } else cb(null, html)
+   })
+  }
 
-        cb(error, data)
-      })
-
-    } else cb(null, html)
-  })
   return this
+}
+
+function documentReady(document, $, selectors, cb) {
+  $(document).ready(function() {
+    var error = null
+    var data = null
+        
+    try {
+      data = walk($, selectors)
+    } catch(e) {
+      error = e
+    }
+
+    cb(error, data)
+  })
+}
+
+function applySelectors(url, html, selectors, cb) {
+  var document = jsdom(html, {})
+  var window = document.defaultView
+  var $ = jquery(window)
+
+  documentReady(document, $, selectors, cb)
+
+  return {
+    'url': url,
+    '$': $,
+    'html': html,
+    'window': window,
+    'document': document
+  }
 }
 
 function walk($, select) {
@@ -66,8 +117,6 @@ function walk($, select) {
   var val = null
   var key = null
   var len = keys.length
-
-  console.log('\tparsing keys', keys)
 
   for(var i = 0; i < len; i++) {
     key = keys[i]
@@ -82,16 +131,13 @@ function walk($, select) {
     } else {
       throw new TypeError('Unsupported selector value: '+typeof val)
     }
-
-    console.log('\tparsing for key', key)
   }
     
-  console.log('\tparsing done')
-
   return data
 }
 
-module.exports.client = function() {
-  return new Client()
+module.exports.defaultParams = defaultParams
+module.exports.client = function(params) {
+  return new Client(params || defaultParams)
 }
 
