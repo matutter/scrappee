@@ -4,7 +4,34 @@ const jquery = require('jquery')
 const jsdom = require('jsdom').jsdom
 
 const defaultParams = {
-  cached: true
+  cached: true,
+  ttl: 5000 // cache ttl 5 seconds
+}
+
+function ClientCache(url, $, doc, client) {
+  this.url = url
+  this.urlHash = hash(url)
+  this.$ = $
+  this.document = doc
+  this.clientRef = client
+  this.ttl = client.cache.ttl
+  this.expiresTimeout = null
+
+  return this.hit()
+}
+
+// hitting cache extends its TTL
+ClientCache.prototype.hit = function() {
+  if(this.expiresTimeout)
+    clearTimeout(this.expiresTimeout)
+
+  this.expiresTimeout = setTimeout(() => {
+    delete this.clientRef.cache.data[this.urlHash]
+    this.clientRef.cache.data[this.urlHash] = null
+  }, this.ttl);
+
+  // ensure cache exists
+  this.clientRef.addCache(this)
 }
 
 function Client(params) {
@@ -12,7 +39,10 @@ function Client(params) {
   this._selectors = null
   this._method = null
   this._cached = params.cached
-  this.cache = {}
+  this.cache = {
+    ttl: params.ttl,
+    data: {} // map of urls to ClientCache
+  }
 }
 
 Client.prototype.cached = function(cached) {
@@ -40,12 +70,17 @@ Client.prototype.post = function(url) {
   return this.url(url)
 }
 
-Client.prototype.addCache = function(key, domData) {
-  this.cache[key] = domData
+Client.prototype.setTTL = function(ttl) {
+  this.cache.ttl = ttl
+  return this
 }
 
-Client.prototype.getCache = function(key) {
-  return this.cache[key] || false
+Client.prototype.addCache = function(cache) {
+  this.cache.data[cache.urlHash] = cache
+}
+
+Client.prototype.getCache = function(url) {
+  return this.cache.data[hash(url)]
 }
 
 Client.prototype.then = function(cb) {
@@ -53,11 +88,10 @@ Client.prototype.then = function(cb) {
   if(!cb) throw new TypeError('Callback expected')
 
   var url = this._url
-  var urlHash = hash(url)
   var method = this._method
   var selectors = this._selectors
   var cached = this._cached
-  var cache = this.getCache(urlHash)
+  var cache = this.getCache(url)
   
   if(cache) {
     if(selectors) {
@@ -65,13 +99,14 @@ Client.prototype.then = function(cb) {
     } else {
       cb(null, cache.html)
     }
+    cache.hit() // reset expiration
   } else {
     method(url, (err, res, html) => {
       if(err) return cb(err, null)
       if(selectors) {
-        var domData = applySelectors(url, html, selectors, cb)
+        cache = applySelectors(url, html, selectors, this, cb)
         if(cached) {
-          this.addCache(urlHash, domData)
+          this.addCache(cache)
         }
       } else cb(null, html)
    })
@@ -95,20 +130,14 @@ function documentReady(document, $, selectors, cb) {
   })
 }
 
-function applySelectors(url, html, selectors, cb) {
+function applySelectors(url, html, selectors, client, cb) {
   var document = jsdom(html, {})
   var window = document.defaultView
   var $ = jquery(window)
 
   documentReady(document, $, selectors, cb)
 
-  return {
-    'url': url,
-    '$': $,
-    'html': html,
-    'window': window,
-    'document': document
-  }
+  return new ClientCache(url, $, document, client)
 }
 
 function walk($, select) {

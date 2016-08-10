@@ -35,4 +35,19 @@ describe('GET from github.com/matutter', function() {
     })
   })
 
+  describe('Letting cache ttl expire and removed cache', function() {
+    it('should clear any cached results after the ttl', function(done){
+      var url = 'http://webscraper.io/test-sites/tables'
+      client.setTTL(1000).get(url)
+      .then((e, data) => {
+        assert.equal(e, null)
+        setTimeout(()=>{
+          var cache = client.getCache(url)
+          assert.equal(cache, null)
+          done()
+        }, 1500)
+      })      
+    })
+  })
+
 })
