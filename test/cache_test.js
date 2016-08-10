@@ -50,4 +50,20 @@ describe('GET from github.com/matutter', function() {
     })
   })
 
+  describe('Trying to get HTML from cache', function() {
+    it('should thrown an unsupported error', function(done){
+      var url = 'http://webscraper.io/test-sites/tables'
+      client.setTTL(10000).get(url)
+      .then((e, data) => {
+        assert.equal(e, null, 'initial request failed')
+
+        client.select(null) // clear selectors
+        .then((e, data) => {
+          assert.equal(e.message, 'Caching for raw HTML not supported')
+          done()
+        })
+      })      
+    })
+  })
+
 })

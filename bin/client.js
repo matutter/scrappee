@@ -96,10 +96,10 @@ Client.prototype.then = function(cb) {
   if(cache) {
     if(selectors) {
       documentReady(cache.document, cache.$, selectors, cb)
-    } else {
-      cb(null, cache.html)
+      cache.hit() // reset expiration
+    } else {     
+     cb(new TypeError('Caching for raw HTML not supported'), null)
     }
-    cache.hit() // reset expiration
   } else {
     method(url, (err, res, html) => {
       if(err) return cb(err, null)
