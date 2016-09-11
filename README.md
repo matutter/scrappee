@@ -1,39 +1,5 @@
 [![dependencies Status](https://david-dm.org/matutter/scrappee/status.svg)](https://david-dm.org/matutter/scrappee)
 
-# SCRAPPEE
-
-A simple web-scraper cmd line tool.
-
-
-Usage:
-<pre>
--url, -u              Base url      - Base url, may contain {} to be replaced by
-                                      the url sequece tokens.
-
--url-sequence,        Url sequence  - Comma separated list of tokens to replace
--url-seq, -us                         the {} identifier in the base url.
-
-'-selectors, -s,      Selector list - Comma separated list of selectors.
--select, -sel                         Selectors may contain the following syntax
-                                      $&lt;key&gt;=&lt;selector&gt; to allow methods of the 
-                                      parse module to be called by the &lt;key&gt;.
-                                      The query objects produced will have a data
-                                      property which contains the parsed or unparsed 
-                                      data in the same way; query.data.&lt;key&gt; = &lt;data&gt;
-                                      Without the selector key syntax content in 
-                                      placed by orginality and may be accessed via
-                                      query[&lt;index&gt;].
-
--parse-module,        Parse module  - nodejs module which will be loaded to parse
--parse-mod, -pm                       text from the website's content.
-                                      Module contract below.
-</pre>
-
-__Parse Module Contract__
-
-The selector list syntax ```$<key>=<selector>``` allows exports from the parse-module
-to be used to work on the text of the selected content. 
-
-```javascript
-module.exports.<key> = function(text) { return text }
-```
+# Scrappee
+#### Webscraper interface built with [request](https://www.npmjs.com/package/request) and [jsdom](https://www.npmjs.com/package/jsdom) that features dom selection with [jquery](https://www.npmjs.com/package/jquery)
+> Note: The scrappee-cli has moved [here](https://github.com/matutter/scrappee-cli) and is under development
