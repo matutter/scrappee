@@ -1,7 +1,7 @@
 {
   "name": "scrappee",
-  "version": "2.0.3",
-  "description": "",
+  "version": "2.0.4",
+  "description": "A clean web scraper built on request, jsdom, and jquery",
   "main": "scrappee.js",
   "scripts": {
     "test": "mocha ./test",
