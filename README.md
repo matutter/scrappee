@@ -3,3 +3,13 @@
 # Scrappee
 #### Webscraper interface built with [request](https://www.npmjs.com/package/request) and [jsdom](https://www.npmjs.com/package/jsdom) that features dom selection with [jquery](https://www.npmjs.com/package/jquery)
 > Note: The scrappee-cli has moved [here](https://github.com/matutter/scrappee-cli) and is under development
+
+```javascript
+var client = require('scrappee').client()
+
+client.get("https://github.com/matutter")
+.select({ username: ".vcard-username" })
+.then((e, res) => {
+  console.log(res.username) // matutter
+})
+```
